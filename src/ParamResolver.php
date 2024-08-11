@@ -142,13 +142,11 @@ class ParamResolver
             return $this->resolveString($resolved, $resolving);
         }, $value);
 
-        if (!isset($onlyKey)) {
-            return $replaced;
+        if ($setKey = isset($onlyKey)) {
+            $resolving[$onlyKey] = true;
         }
 
-        $resolving[$onlyKey] = true;
-
-        return $this->resolveValue($this->get($onlyKey), $resolving);
+        return $setKey ? $this->resolveValue($this->get($onlyKey), $resolving) : $replaced;
     }
 
     /**
