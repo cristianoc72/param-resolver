@@ -116,21 +116,19 @@ class ParamResolver
         $onlyKey = null;
         $replaced = preg_replace_callback('/%([^%\s]*+)%/', function (array $match) use ($resolving, $value, &$onlyKey) {
             $key = $match[1];
-
-            // skip %%
-            if ($key === '') {
-                return '%%';
-            }
-
             $env = $this->parseEnvironmentParams($key);
-            if (null !== $env) {
-                return $env;
-            }
 
-            if (isset($resolving[$key])) {
-                throw new ParamResolverException("Circular reference detected for parameter '$key'.");
+            $out = match (true) {
+                $key === '' => '%%',
+                $env !== null => $env,
+                isset($resolving[$key]) => throw new ParamResolverException("Circular reference detected for parameter '$key'."),
+                default => null
+            };
+            
+            if ($out !== null) {
+                return $out;
             }
-
+            
             if ($value === $match[0]) {
                 $onlyKey = $key;
 
