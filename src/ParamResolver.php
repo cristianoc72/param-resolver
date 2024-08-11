@@ -137,14 +137,9 @@ class ParamResolver
                 return $match[0];
             }
 
-            $resolved = $this->get($key);
-
-            if (!(is_numeric($resolved) || is_string($resolved))) {
-                throw new ParamResolverException("A string value must be composed of strings and/or numbers.");
-            }
+            $resolved = Validator::validateString($this->get($key));
 
             $resolving[$key] = true;
-            $resolved = (string)$resolved;
 
             return $this->resolveString($resolved, $resolving);
         }, $value);
@@ -195,11 +190,8 @@ class ParamResolver
     private function get(int|string $propertyKey): mixed
     {
         $value = $this->findValue($propertyKey, $this->config);
-        if (!$value->valid()) {
-            throw new ParamResolverException("Parameter '$propertyKey' not found.");
-        }
 
-        return $value->current();
+        return Validator::validateGenerator($value, $propertyKey)->current();
     }
 
     /**
@@ -237,13 +229,7 @@ class ParamResolver
         if (!str_starts_with($value, 'env.')) {
             return null;
         }
-        $env = substr($value, 4);
-        $envParam = getenv($env);
 
-        if ($envParam === false) {
-            throw new ParamResolverException("Environment variable '$env' is not defined.");
-        }
-
-        return $envParam;
+        return Validator::validateEnvParam(substr($value, 4));
     }
 }
