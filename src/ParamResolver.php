@@ -124,11 +124,11 @@ class ParamResolver
                 isset($resolving[$key]) => throw new ParamResolverException("Circular reference detected for parameter '$key'."),
                 default => null
             };
-            
+
             if ($out !== null) {
                 return $out;
             }
-            
+
             if ($value === $match[0]) {
                 $onlyKey = $key;
 
