@@ -222,6 +222,19 @@ class ParamResolverTest extends TestCase
         $this->assertSame([], $this->resolver->resolve($config));
     }
 
+    public function testResolveWrongKeyThrowsException(): void
+    {
+        $this->expectException(ParamResolverException::class);
+        $this->expectExceptionMessageIs("Resolved key must be a string or an integer, got array");
+
+        $config = [
+            'foo' => ['bar' => 'baz'],
+            '%foo%' => 'babar',
+        ];
+
+        $this->resolver->resolve($config);
+    }
+
     public static function providerForResolveParams(): array
     {
         return [
